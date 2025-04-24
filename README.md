@@ -16,6 +16,8 @@ sudo apt-get install libboost-all-dev
 sudo apt-get install libspdlog-dev
 sudo apt-get install libssl-dev
 sudo apt-get install libmysqlclient-dev
+sudo apt install pkg-config0
+sudo apt install libfmt-dev
 ```
 2. 빌드
 ```bash

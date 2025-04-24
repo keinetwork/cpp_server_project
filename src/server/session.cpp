@@ -77,12 +77,35 @@ void Session::handle_read(const boost::system::error_code& error, size_t bytes_t
         return;
     }
     
-    // 수신된 데이터 처리
-    std::string message(buffer_.data(), bytes_transferred);
-    Logger::debug("수신된 메시지: " + message);
-    
-    // 에코 응답
-    send("Echo: " + message);
+    try {
+        // 수신된 데이터를 Protocol::Message로 변환
+        std::vector<uint8_t> received_data(buffer_.data(), buffer_.data() + bytes_transferred);
+        auto message = Protocol::Message::deserialize(received_data);
+        
+        // 메시지 타입에 따른 처리
+        switch (message.getType()) {
+            case Protocol::MessageType::DATA: {
+                std::string data_str(message.getData().begin(), message.getData().end());
+                Logger::info("수신된 메시지: " + data_str);
+                
+                // 에코 응답 생성
+                std::string response = "Echo: " + data_str;
+                std::vector<uint8_t> response_data(response.begin(), response.end());
+                Protocol::Message response_msg(Protocol::MessageType::DATA, response_data);
+                
+                // 응답 전송
+                auto serialized = response_msg.serialize();
+                send(std::string(serialized.begin(), serialized.end()));
+                break;
+            }
+            default:
+                Logger::warn("알 수 없는 메시지 타입: " + std::to_string(static_cast<int>(message.getType())));
+                break;
+        }
+    }
+    catch (const std::exception& e) {
+        Logger::error("메시지 처리 중 오류 발생: " + std::string(e.what()));
+    }
     
     // 다음 읽기 시작
     do_read();

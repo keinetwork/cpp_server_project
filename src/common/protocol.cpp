@@ -1,5 +1,6 @@
 #include "common/protocol.hpp"
 #include <cstring>
+#include <stdexcept>  // 이 줄을 추가
 
 uint32_t Protocol::Message::sequence_counter_ = 0;
 

@@ -5,6 +5,7 @@
 #include <string>
 #include <queue>
 #include <mutex>
+#include "common/protocol.hpp"  // 추가
 
 class Session : public std::enable_shared_from_this<Session> {
 public:
